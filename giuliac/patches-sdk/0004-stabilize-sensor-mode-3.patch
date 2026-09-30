@@ -1,0 +1,42 @@
+From 4b3f65bfa250e5276190462940d5410a5c780ef7 Mon Sep 17 00:00:00 2001
+From: ronardnx <dragosh.rotaru.dragosh@gmail.com>
+Date: Mon, 28 Sep 2026 16:43:59 +0000
+Subject: [PATCH] sdk: Stabilize sensor mode 3 prior to capture
+
+---
+ .../ocs/camera/producer/mode/PhotoMode.smali  | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/smali/com/oplus/ocs/camera/producer/mode/PhotoMode.smali b/smali/com/oplus/ocs/camera/producer/mode/PhotoMode.smali
+index dc165b7..78131c3 100644
+--- a/smali/com/oplus/ocs/camera/producer/mode/PhotoMode.smali
++++ b/smali/com/oplus/ocs/camera/producer/mode/PhotoMode.smali
+@@ -8185,6 +8185,25 @@
+     return v1
+ 
+     :cond_a
++    const/4 v8, 0x3
++
++    if-ne v7, v8, :cond_no_dol_wait
++
++    const-string v8, "OplusSensorMode"
++
++    const-string v9, "stabilizing sensor mode 3 (70ms)"
++
++    invoke-static {v8, v9}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
++
++    const-wide/16 v8, 0x46
++
++    :try_start_dol_wait
++    invoke-static {v8, v9}, Ljava/lang/Thread;->sleep(J)V
++    :try_end_dol_wait
++    .catch Ljava/lang/InterruptedException; {:try_start_dol_wait .. :try_end_dol_wait} :catch_dol_wait
++
++    :catch_dol_wait
++    :cond_no_dol_wait
+     return v2
+ 
+     :cond_b
+-- 
+2.43.0
+
