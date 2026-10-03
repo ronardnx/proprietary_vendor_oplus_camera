@@ -1,0 +1,44 @@
+diff --git a/smali/com/oplus/camera/configure/CameraConfig.smali b/smali/com/oplus/camera/configure/CameraConfig.smali
+index 62661350..8158800b 100644
+--- a/smali/com/oplus/camera/configure/CameraConfig.smali
++++ b/smali/com/oplus/camera/configure/CameraConfig.smali
+@@ -1576,6 +1576,39 @@
+ .method public static getConfigBooleanValue(Ljava/lang/String;)Z
+     .locals 5
+ 
++    # Report 120fps video features as supported
++    const-string v0, "com.oplus.feature.video.4k.120fps.support"
++
++    invoke-virtual {v0, p0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v0
++
++    if-nez v0, :cond_giulia_120fps_on
++
++    const-string v0, "com.oplus.feature.video.1080p.120fps.support"
++
++    invoke-virtual {v0, p0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v0
++
++    if-nez v0, :cond_giulia_120fps_on
++
++    const-string v0, "com.oplus.feature.video.120fps.camera.main.only.support"
++
++    invoke-virtual {v0, p0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v0
++
++    if-nez v0, :cond_giulia_120fps_on
++
++    goto :goto_giulia_120fps_done
++
++    :cond_giulia_120fps_on
++    const/4 v0, 0x1
++
++    return v0
++
++    :goto_giulia_120fps_done
+     .line 1
+     sget-object v0, Lcom/oplus/camera/configure/CameraConfig;->d:Ljava/util/concurrent/ConcurrentHashMap;
+ 
