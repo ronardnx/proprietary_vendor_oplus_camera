@@ -1,0 +1,154 @@
+diff --git a/smali/com/oplus/camera/configure/CameraConfig.smali b/smali/com/oplus/camera/configure/CameraConfig.smali
+index 8158800b..fe72ecad 100644
+--- a/smali/com/oplus/camera/configure/CameraConfig.smali
++++ b/smali/com/oplus/camera/configure/CameraConfig.smali
+@@ -1609,6 +1609,23 @@
+     return v0
+ 
+     :goto_giulia_120fps_done
++    # Report 8K as supported
++    const-string v0, "com.oplus.feature.video.8k.support"
++
++    invoke-virtual {v0, p0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v0
++
++    if-nez v0, :cond_8k_on
++
++    goto :goto_8k_done
++
++    :cond_8k_on
++    const/4 v0, 0x1
++
++    return v0
++
++    :goto_8k_done
+     .line 1
+     sget-object v0, Lcom/oplus/camera/configure/CameraConfig;->d:Ljava/util/concurrent/ConcurrentHashMap;
+ 
+diff --git a/smali_classes12/com/oplus/camera/module/a.smali b/smali_classes12/com/oplus/camera/module/a.smali
+index 587ea0c1..c0ff45f3 100644
+--- a/smali_classes12/com/oplus/camera/module/a.smali
++++ b/smali_classes12/com/oplus/camera/module/a.smali
+@@ -12166,6 +12166,24 @@
+ .method public final W3()I
+     .locals 2
+ 
++    # giulia: 8K at 30fps.
++    invoke-virtual {p0}, Lcom/oplus/camera/module/BaseMode;->S4()Ljava/lang/String;
++
++    move-result-object v0
++
++    const-string v1, "video_size_8k"
++
++    invoke-virtual {v1, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v0
++
++    if-eqz v0, :cond_giulia_8k_w3_done
++
++    const/16 v0, 0x1e
++
++    return v0
++
++    :cond_giulia_8k_w3_done
+     .line 1
+     const-string v0, "pref_screen_mode_fixed_video_frame_key"
+ 
+@@ -31592,6 +31610,28 @@
+ .method public final ri()Ljava/lang/Double;
+     .locals 2
+ 
++    # giulia: Keep capture rate equal to the 30fps 8K frame rate.
++    invoke-virtual {p0}, Lcom/oplus/camera/module/BaseMode;->S4()Ljava/lang/String;
++
++    move-result-object v0
++
++    const-string v1, "video_size_8k"
++
++    invoke-virtual {v1, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v0
++
++    if-eqz v0, :cond_giulia_8k_ri_done
++
++    const-wide/high16 v0, 0x403e000000000000L    # 30.0
++
++    invoke-static {v0, v1}, Ljava/lang/Double;->valueOf(D)Ljava/lang/Double;
++
++    move-result-object p0
++
++    return-object p0
++
++    :cond_giulia_8k_ri_done
+     .line 1
+     invoke-virtual {p0}, Lcom/oplus/camera/module/a;->r()Z
+ 
+diff --git a/smali_classes29/la/e.smali b/smali_classes29/la/e.smali
+index 0e5b8815..008462e2 100644
+--- a/smali_classes29/la/e.smali
++++ b/smali_classes29/la/e.smali
+@@ -610,13 +610,33 @@
+     move-result-object v4
+ 
+     .line 172
++    # giulia: 8K at 30fps
++    invoke-virtual/range {p0 .. p0}, Lla/e;->o1()Ljava/lang/String;
++
++    move-result-object v4
++
++    const-string v8, "video_size_8k"
++
++    invoke-virtual {v8, v4}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v4
++
++    if-eqz v4, :cond_giulia_8k_fps_else
++
++    const/16 v4, 0x1e
++
++    goto :cond_giulia_8k_fps_done
++
++    :cond_giulia_8k_fps_else
++    invoke-virtual/range {p0 .. p0}, Lcom/oplus/camera/feature/arch/mvp/y;->getCameraMode()Ljava/lang/String;
++
++    move-result-object v4
++
+     invoke-static {v4}, Lla/b;->i(Ljava/lang/String;)I
+ 
+-    .line 173
+-    .line 174
+-    .line 175
+     move-result v4
+ 
++    :cond_giulia_8k_fps_done
+     .line 176
+     const/16 v8, 0x78
+ 
+@@ -727,6 +747,26 @@
+     .line 224
+     move-result v4
+ 
++    # giulia: 8K at 30fps, avoid 120fps jump
++    invoke-virtual/range {p0 .. p0}, Lla/e;->o1()Ljava/lang/String;
++
++    move-result-object v10
++
++    const-string v12, "video_size_8k"
++
++    invoke-virtual {v12, v10}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v10
++
++    if-eqz v10, :cond_giulia_8k_cond5_skip
++
++    const/16 v4, 0x1e
++
++    :cond_giulia_8k_cond5_skip
++    const-string v10, "video_24fps"
++
++    const-string v12, "video_120fps"
++
+     .line 225
+     if-ne v8, v4, :cond_6
+ 
